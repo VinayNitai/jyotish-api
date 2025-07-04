@@ -1,0 +1,11 @@
+Flask
+Werkzeug
+MarkupSafe
+Jinja2
+itsdangerous
+click
+python-dateutil
+pytz
+numpy
+pyswisseph
+gunicorn
