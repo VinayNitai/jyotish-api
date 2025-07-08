@@ -22,8 +22,8 @@ services:
       - "80" # Coolify vai se conectar a esta porta
     # Monta o volume com nosso arquivo de configuração
     volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
-      # Compartilha o código da aplicação com o Nginx para servir arquivos estáticos
+      # Apenas esta linha mudou. Trocamos o nome do arquivo de destino.
+      - ./nginx.conf:/etc/nginx/conf.d/jyotish.conf
       - ./api:/var/www/html
     # Garante que o serviço Nginx só inicie depois do serviço PHP
     depends_on:
