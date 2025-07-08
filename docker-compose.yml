@@ -1,22 +1,29 @@
 version: '3.8'
 
 services:
-  # Serviço PHP
+  # Serviço PHP (sem alterações)
   php:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: jyotish-api-php
 
-  # Serviço Nginx (sem healthcheck)
+  # Serviço Nginx (com alterações)
   nginx:
-    # Voltamos a usar a imagem padrão do Nginx
-    image: nginx:alpine
+    build:
+      context: .
+      dockerfile: nginx.dockerfile # Usa nosso Dockerfile customizado
     container_name: jyotish-api-nginx
     ports:
       - "80"
     volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/jyotish.conf
-      - ./api:/var/www/html
+      # REMOVEMOS a linha do nginx.conf daqui, pois ele agora é copiado no build.
+      - ./api:/var/www/html # Mantemos esta para o Nginx acessar arquivos públicos se necessário.
     depends_on:
       - php
+    # REATIVAMOS o healthcheck, pois agora ele vai funcionar!
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost/api/ping || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
