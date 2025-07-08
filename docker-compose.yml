@@ -1,20 +1,17 @@
 version: '3.8'
 
 services:
-  # Serviço PHP (sem alterações)
+  # Serviço PHP
   php:
     build:
       context: .
-      dockerfile: Dockerfile # Usa o Dockerfile do PHP
+      dockerfile: Dockerfile
     container_name: jyotish-api-php
 
-  # Serviço Nginx (com alterações)
+  # Serviço Nginx (sem healthcheck)
   nginx:
-    # AQUI ESTÁ A MUDANÇA: Em vez de usar uma imagem pronta,
-    # construímos a nossa própria usando o nginx.dockerfile.
-    build:
-      context: .
-      dockerfile: nginx.dockerfile
+    # Voltamos a usar a imagem padrão do Nginx
+    image: nginx:alpine
     container_name: jyotish-api-nginx
     ports:
       - "80"
@@ -23,11 +20,3 @@ services:
       - ./api:/var/www/html
     depends_on:
       - php
-    # AQUI ESTÁ A SUA SOLUÇÃO: Adicionamos o healthcheck.
-    # Ele roda DENTRO do contêiner nginx e verifica se a aplicação responde.
-    # Usamos o endpoint /api/ping que já sabemos que existe.
-    healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost/api/ping || exit 1"]
-      interval: 5s
-      timeout: 20s
-      retries: 10
