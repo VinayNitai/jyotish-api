@@ -1,33 +1,33 @@
-# Usa uma imagem base oficial do PHP 8.2 com FPM (FastCGI Process Manager)
+# Dockerfile (Versão Definitiva)
 FROM php:8.2-fpm-alpine
 
-# Instala dependências do sistema necessárias para a aplicação e para compilar 'swetest'
-# git, make, g++ -> para compilar
-# zip, intl -> extensões comuns do PHP/Symfony
+# Instala dependências do sistema
 RUN apk add --no-cache git make g++ zip libzip-dev icu-dev \
     && docker-php-ext-install zip intl
 
-# Instala o Composer (gerenciador de pacotes do PHP)
+# Instala o Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Define o diretório de trabalho
-WORKDIR /var/www/html
+# --- MUDANÇA IMPORTANTE ---
+# Define o diretório de trabalho como /var/www, um nível acima
+WORKDIR /var/www
 
-# Copia os arquivos da aplicação do subdiretório 'api' para o contêiner.
-# Isto copia TUDO de 'api', incluindo a pasta 'swetest' que está dentro dela.
-COPY api/ .
+# Copia os arquivos da pasta local 'api' para uma pasta 'api' no contêiner
+# Resultando no caminho /var/www/api/
+COPY api ./api
 
-# Instala TODAS as dependências do PHP com o Composer (removido --no-dev)
+# Define o diretório de trabalho para dentro da pasta da api para o composer
+WORKDIR /var/www/api
+
+# Instala as dependências do PHP
 RUN composer install --optimize-autoloader
 
-# Copia nosso novo script de inicialização para dentro do contêiner
+# Copia o script de inicialização
 COPY start.sh /usr/local/bin/start.sh
 
-# Dá permissão de execução para o script
+# Dá permissão de execução
 RUN chmod +x /usr/local/bin/start.sh
 
-# Expõe a porta 9000, que é o padrão do PHP-FPM
-# O Coolify irá mapear a porta externa (9393) para esta.
 EXPOSE 9000
 
 # Define nosso script como o comando de inicialização
