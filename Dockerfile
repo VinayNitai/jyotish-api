@@ -17,8 +17,8 @@ WORKDIR /var/www/html
 # Isto copia TUDO de 'api', incluindo a pasta 'swetest' que está dentro dela.
 COPY api/ .
 
-# Instala as dependências do PHP com o Composer
-RUN composer install --no-dev --optimize-autoloader
+# Instala TODAS as dependências do PHP com o Composer (removido --no-dev)
+RUN composer install --optimize-autoloader
 
 # Copia nosso novo script de inicialização para dentro do contêiner
 COPY start.sh /usr/local/bin/start.sh
