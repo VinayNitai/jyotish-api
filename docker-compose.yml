@@ -1,30 +1,33 @@
 version: '3.8'
 
 services:
-  # Serviço PHP
+  # Serviço PHP (sem alterações)
   php:
-    # Constrói a imagem usando o Dockerfile que já criamos
     build:
       context: .
-      dockerfile: Dockerfile
-    # O nome do contêiner não é estritamente necessário, mas é uma boa prática
+      dockerfile: Dockerfile # Usa o Dockerfile do PHP
     container_name: jyotish-api-php
 
-  # Serviço Nginx
+  # Serviço Nginx (com alterações)
   nginx:
-    # Usa uma imagem oficial do Nginx
-    image: nginx:alpine
-    # Nome do contêiner
+    # AQUI ESTÁ A MUDANÇA: Em vez de usar uma imagem pronta,
+    # construímos a nossa própria usando o nginx.dockerfile.
+    build:
+      context: .
+      dockerfile: nginx.dockerfile
     container_name: jyotish-api-nginx
-    # Mapeia a porta 80 do Nginx para a porta que o Coolify vai acessar.
-    # Usaremos a porta 80, o padrão para web.
     ports:
-      - "80" # Coolify vai se conectar a esta porta
-    # Monta o volume com nosso arquivo de configuração
+      - "80"
     volumes:
-      # Apenas esta linha mudou. Trocamos o nome do arquivo de destino.
       - ./nginx.conf:/etc/nginx/conf.d/jyotish.conf
       - ./api:/var/www/html
-    # Garante que o serviço Nginx só inicie depois do serviço PHP
     depends_on:
       - php
+    # AQUI ESTÁ A SUA SOLUÇÃO: Adicionamos o healthcheck.
+    # Ele roda DENTRO do contêiner nginx e verifica se a aplicação responde.
+    # Usamos o endpoint /api/ping que já sabemos que existe.
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost/api/ping || exit 1"]
+      interval: 5s
+      timeout: 20s
+      retries: 10
