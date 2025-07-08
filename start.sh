@@ -1,7 +1,9 @@
 #!/bin/sh
+# start.sh (Versão Definitiva)
 
 echo ">>> Compilando a biblioteca Swiss Ephemeris..."
-cd /var/www/html/swetest/src
+# O caminho agora é /var/www/api
+cd /var/www/api/swetest/src
 make
 
 if [ ! -f "swetest" ]; then
@@ -12,11 +14,11 @@ fi
 chmod +x swetest
 echo ">>> Compilação concluída com sucesso."
 
-# --- A LINHA FINAL QUE FALTAVA ---
+# Não precisamos mais do link simbólico, pois o caminho agora está correto,
+# mas vamos mantê-lo por segurança. Ele não causa mal.
 echo ">>> Criando link simbólico para acesso global..."
-ln -s /var/www/html/swetest/src/swetest /usr/local/bin/swetest
+ln -s /var/www/api/swetest/src/swetest /usr/local/bin/swetest
 
-# Volta para a raiz e inicia o servidor
-cd /var/www/html
+# Inicia o servidor PHP-FPM
 echo ">>> Iniciando o servidor PHP-FPM..."
 exec php-fpm
