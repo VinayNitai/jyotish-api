@@ -8,14 +8,21 @@ services:
       dockerfile: Dockerfile
     container_name: jyotish-api-php
 
-  # Serviço Nginx (simplificado e sem healthcheck)
+  # Serviço Nginx (agora com build em pasta separada)
   nginx:
-    image: nginx:alpine
+    build:
+      context: ./nginx # <-- A MUDANÇA CRÍTICA: Aponta para a nova pasta
     container_name: jyotish-api-nginx
     ports:
       - "80"
     volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/jyotish.conf
-      - ./api:/var/www/html
+      # Não precisamos mais montar o nginx.conf, pois ele já foi copiado no build.
+      # Mantemos este volume para que o Nginx possa servir arquivos estáticos se precisar.
+      - ./api/public:/var/www/html/public
     depends_on:
       - php
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost/api/ping || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
