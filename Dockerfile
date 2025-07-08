@@ -13,10 +13,9 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Define o diretório de trabalho
 WORKDIR /var/www/html
 
-# Copia os arquivos da aplicação do subdiretório 'api' para o contêiner
-# Isso é crucial, pois o código PHP está dentro da pasta 'api' no repositório
+# Copia os arquivos da aplicação do subdiretório 'api' para o contêiner.
+# Isto copia TUDO de 'api', incluindo a pasta 'swetest' que está dentro dela.
 COPY api/ .
-COPY swetest/ ./swetest/
 
 # Instala as dependências do PHP com o Composer
 RUN composer install --no-dev --optimize-autoloader
